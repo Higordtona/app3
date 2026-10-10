@@ -4,7 +4,7 @@ import pytest
 import requests
 
 BASE_URL = os.environ.get("EXPO_PUBLIC_BACKEND_URL", "").rstrip("/")
-ADMIN_PIN = os.environ.get("TEST_ADMIN_PIN", "2798")
+ADMIN_PIN = os.environ.get("TEST_ADMIN_PIN") or os.environ.get("ADMIN_PIN")
 
 
 @pytest.fixture(scope="session")
@@ -24,7 +24,9 @@ def api_client(base_url):
 
 @pytest.fixture(scope="session")
 def admin_token(api_client, base_url):
-    """Unlock the staff panel once per session (PIN 2798)"""
+    """Unlock the staff panel once per session using the configured test PIN."""
+    if not ADMIN_PIN:
+        pytest.skip("Set TEST_ADMIN_PIN or ADMIN_PIN to run authenticated API tests")
     resp = api_client.post(f"{base_url}/api/admin/unlock", json={"pin": ADMIN_PIN}, timeout=15)
     assert resp.status_code == 200, f"Admin unlock failed: {resp.text}"
     data = resp.json()

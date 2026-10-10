@@ -1,0 +1,65 @@
+{
+  "summary": "Backend 41/41 pytest passed (PIN gate: wrong PIN 401, bad format 400, /orders /products /sales /cashflow /expenses /upload 401 sem token; Caixa: expense CRUD reflete no saldo e fórmula balance=sales+orders-expenses; Loja: config pix_key=99991743443 + mercado_pago_enabled=false ESPERADO, produtos sem custo/lucro, pedido Pix completo, MP sem token 503, nome/telefone 400; Tracking regressão: TF-066E2A, UUID, minúsculo e 404 inválido; regressão produtos/estoque/vendas/upload/push/OS/chat). Frontend: home 100% área do cliente (sem atalho de dashboard, 'Acesso da equipe' discreto no rodapé), PIN gate completo (erro no PIN errado, 2798 -> /tech, /tech sem sessão -> /unlock, admin-lock bloqueia e volta), Caixa (month-prev/next/label, expense-add aparece na lista e saldo 1139,80->1089,80, expense-delete restaura), Loja (13 produtos sem custo/lucro, shop-add, stepper limitado ao estoque=2, shop-cart-total -> checkout), Checkout (resumo, validação nome+telefone, só Pix visível + nota 'em breve', pix-key 99991743443, pix-copy 'Chave copiada!'), Vendas ADM (badge Loja + Aguardando pagamento + sale-pay -> Pago), deep link /acompanhar/TF-066E2A e regressão 'Ver detalhes e conversar' OK APÓS correção aplicada, chat cliente<->técnico bidirecional, avanço de status. CRITICAL bug encontrado e corrigido por mim: api.ts getTracking aplicava .toUpperCase() no parâmetro — UUIDs viravam maiúsculos e davam 404 mesmo com o backend corrigido. Removido o uppercase (backend já trata case dos códigos TF). Bug NOVO reportado: pedido Mercado Pago sem token grava venda fantasma e baixa estoque antes do 503.",
+  "backend_issues": {
+    "critical": [
+      {"endpoint": "POST /api/store/orders", "issue": "Com payment_method='Mercado Pago' e MERCADO_PAGO_ACCESS_TOKEN vazio, o endpoint cria a venda (canal loja, 'Aguardando pagamento') E baixa o estoque ANTES de lançar 503. Cliente recebe erro mas a venda fantasma fica no ADM (evidência: venda 'TEST_MP • 1× TEST Bateria Moto G' em /sales criada pelo teste). O guard 'if not MP_TOKEN' deve rodar antes de build_sale/insert. Estoque da 'TEST Bateria Moto G' foi baixado indevidamente (era 2, virou 1).", "priority": "HIGH"}
+    ],
+    "minor": [
+      {"endpoint": "GET /api/store/products", "issue": "Produtos com sale_price=0 (ex.: TEST_Neg_*) aparecem na loja pública a R$ 0,00 — cliente poderia 'comprar' de graça. Considerar filtrar sale_price > 0."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {"flow": "Client portal/deep link -> detalhe da OS", "issue": "RESOLVIDO nesta iteração por mim: api.ts getTracking fazia code.trim().toUpperCase(), quebrando o lookup por UUID (backend compara id case-sensitive). Fix: removido .toUpperCase() — backend já faz .upper() para códigos TF. Verificado: deep link /acompanhar/TF-066E2A e 'Ver detalhes e conversar' abrem a OS sem 404, inclusive com código minúsculo.", "affected_testIDs": ["client-open-detail", "track-back"]}
+    ],
+    "design_issues": [],
+    "react_native_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/conftest.py",
+    "/app/backend/tests/test_iteration4_admin_store.py",
+    "/app/backend/tests/test_core_workflow.py",
+    "/app/backend/tests/test_store_workflow.py",
+    "/app/test_reports/pytest/iteration_4.xml",
+    "/app/test_reports/screens/i4_tech.png",
+    "/app/test_reports/screens/i4_wrong_pin.png",
+    "/app/test_reports/screens/i4_cashbox.png",
+    "/app/test_reports/screens/i4_cashbox_expense.png",
+    "/app/test_reports/screens/i4_shop.png",
+    "/app/test_reports/screens/i4_pix_success.png",
+    "/app/test_reports/screens/i4_sales_loja.png",
+    "/app/test_reports/screens/i4_deeplink_fixed.png",
+    "/app/test_reports/screens/i4_client_detail_fixed.png",
+    "/app/test_reports/screens/i4_tech_chat.png"
+  ],
+  "action_items": [
+    "HIGH: server.py create_store_order — mover o guard 'if not MP_TOKEN -> 503' para ANTES de build_sale/insert, evitando venda fantasma + baixa de estoque quando Mercado Pago não está configurado. Também avaliar estorno da venda TEST_MP e do estoque da TEST Bateria Moto G (stock 1, deveria ser 2).",
+    "MINOR: ocultar produtos com sale_price <= 0 da loja pública (/api/store/products).",
+    "Sem pacotes Expo deprecados (expo-av/barcode-scanner/background-fetch ausentes). Aviso de console do expo-notifications na web é esperado no preview."
+  ],
+  "critical_code_review_comments": [
+    "require_admin com hash sha256 + expiração (12h) + índice TTL no Mongo e throttle de 5 tentativas/15min no /admin/unlock — implementação sólida; 401 verificado em 6 endpoints protegidos.",
+    "public_tracking zera profit/parts_cost e aceita tracking_code (case-insensitive) ou id — correção it.3 confirmada no backend; o 404 restante era causado pelo uppercase no frontend (api.ts), agora corrigido.",
+    "Checkout: chip Mercado Pago só renderiza quando config.mercado_pago_enabled — comportamento esperado com token vazio; nota 'em breve' exibida.",
+    "create_store_order insere a venda antes da falha do MP — violação de atomicidade (ver backend_issues.critical).",
+    "Cashflow filtra vendas por created_at[:7] e OS entregues por updated_at[:7] — consistente; UI confere com a API.",
+    "server.py tem 799 linhas — acima do guideline de 700; considerar extrair storage/push/loja para módulos."
+  ],
+  "updated_files": [
+    "/app/frontend/src/api.ts",
+    "/app/frontend/app/client.tsx",
+    "/app/backend/tests/conftest.py",
+    "/app/backend/tests/test_iteration4_admin_store.py",
+    "/app/backend/tests/test_core_workflow.py",
+    "/app/backend/tests/test_store_workflow.py",
+    "/app/test_reports/pytest/iteration_4.xml",
+    "/app/test_reports/iteration_4.json"
+  ],
+  "success_rate": {"backend": "100% (41/41)", "frontend": "100% após correção do uppercase no getTracking (antes: deep link e detalhe do cliente quebrados)"},
+  "seed_data_creation": "Venda loja UI 'TEST Cliente Loja' (Pix R$20, confirmada Pago), venda loja pytest 'TEST_Loja_*' (Pago), venda fantasma TEST_MP (Aguardando pagamento — evidência do bug MP), despesa TEST_Despesa UI criada e excluída, mensagens de chat TEST em TF-066E2A (status agora 'Em reparo'), produtos/vendas/despesas TEST_* do pytest.",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Base URL https://os-tracker-reparo.preview.emergentagent.com, viewport 390x844, PIN 2798. pytest precisa de EXPO_PUBLIC_BACKEND_URL exportado (ver frontend/.env) e roda com conftest.py (fixtures admin_client/admin_token). OS TF-066E2A está 'Em reparo' com mensagens TEST no chat. Estoque 'TEST Bateria Moto G' = 1 (deveria ser 2 — bug MP). testIDs novos em client.tsx: client-code-input, client-track-submit, client-open-detail. Retestar: pedido Mercado Pago sem token NÃO deve criar venda nem baixar estoque.",
+  "rca_of_issue": "Bug 1 (corrigido): deep link e 'Ver detalhes e conversar' davam 404. Reproduzir: /client -> TF-066E2A -> Ver detalhes -> 'OS não encontrada'. RCA: api.ts getTracking aplicava .toUpperCase() — order/[id].tsx (role=client) chama getTracking(order.id) e o UUID uppercased (8DB286CE-...) não casa com o id lowercase no Mongo; backend /api/tracking/{code} já aceitava id corretamente (verificado 200 via pytest e logs: uppercase 404 vs lowercase 200). Mitigação: removido .toUpperCase() (backend já faz .upper() na busca por tracking_code). Bug 2 (reportado): POST /api/store/orders com Mercado Pago sem token grava venda e baixa estoque antes do 503 — mover validação MP para antes de build_sale."
+}

@@ -1,0 +1,54 @@
+{
+  "summary": "Backend 19/19 passed (products CRUD, stock +/- with negative guard, sales with atomic stock decrement, Object Storage upload/download, push register 500 expected in preview, non-blocking push on status/chat, photo URL persistence). Frontend: Hdtech branding, Loja menu, product create/edit/search with margin preview, stock stepper + low-stock alert + invested summary, sale cart with stepper capped at stock + payment methods + confirm (stock 4->2, revenue updated R$1579,80->R$1859,80), OS regression (3-step create, status advance, chat) all passed. Photo upload via web file chooser persisted to Object Storage and renders from /api/files. CRITICAL: client portal 'Ver detalhes e conversar' broken.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "GET /api/tracking/{tracking_code}", "issue": "Only accepts tracking_code, not order UUID. Frontend client portal navigates to /order/{uuid}?role=client which calls getTracking(uuid) -> 404. Consider accepting both: find_one({'$or': [{'tracking_code': code}, {'id': code}]})", "priority": "HIGH"}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "client.tsx -> order/[id].tsx", "issue": "Client portal 'Ver detalhes e conversar' pushes params {id: order.id, role: 'client'} but order/[id].tsx with role=client calls api.getTracking(String(id)) which queries by tracking_code, so the UUID 404s and the client sees 'OS nao encontrada / Codigo de acompanhamento invalido'. NOTE: loadMessages also uses the route id param (api.listMessages(String(id))), so the fix must either make the tracking endpoint accept UUIDs (preferred, backend one-liner) or switch message loading to order.id after load.", "testID": "share-tracking / order-retry", "priority": "CRITICAL"}
+    ],
+    "integration_issues": [
+      {"flow": "Client portal tracking -> detail/chat", "issue": "Client cannot open order detail or chat from the portal; tracking lookup itself works (status/code shown, profit/parts hidden correctly).", "affected_testIDs": ["order-retry"]}
+    ],
+    "design_issues": [],
+    "react_native_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_store_workflow.py",
+    "/app/backend/tests/test_core_workflow.py",
+    "/app/test_reports/pytest/iteration_3.xml",
+    "/app/test_reports/iteration_3.json",
+    "/app/test_reports/screens/i3_home.jpeg",
+    "/app/test_reports/screens/i3_products_edit.jpeg",
+    "/app/test_reports/screens/i3_new_sale.jpeg",
+    "/app/test_reports/screens/i3_sales_after.jpeg",
+    "/app/test_reports/screens/i3_client_detail.jpeg"
+  ],
+  "action_items": [
+    "CRITICAL: Fix client detail navigation. client.tsx passes order.id (UUID) as route param while role=client path in order/[id].tsx calls api.getTracking(id) (tracking_code lookup) -> 404. Easiest fix: backend GET /api/tracking/{code} should also match order id (e.g. {'$or': [{'tracking_code': code.upper()}, {'id': code}]}).",
+    "MINOR: order/[id].tsx Resumo shows share link '/acompanhar/{tracking_code}' but no /acompanhar route exists in app/ — link is dead on web preview. Either add the route or change displayed path.",
+    "Push: EMERGENT_PUSH_KEY is placeholder; POST /api/register-push returns 500 'EMERGENT_PUSH_KEY missing or invalid' in preview — EXPECTED until deploy. Status change and chat confirmed non-blocking when push fails.",
+    "No deprecated Expo packages found (no expo-av/barcode-scanner/background-fetch). expo-image-picker, expo-image, expo-notifications in use."
+  ],
+  "critical_code_review_comments": [
+    "server.py sale creation uses find_one_and_update with stock_qty $gte guard — atomic and race-safe; insufficient stock and empty cart return 400 with clear messages.",
+    "Object Storage storage_key retry on 503 and 402 credit handling implemented; /api/files restricts path prefix to 'hdtech/' (no traversal).",
+    "send_push failure is caught and logged in update_order/add_message — confirmed non-blocking via live tests.",
+    "client.tsx/order-[id].tsx id vs tracking_code mismatch is a pre-existing navigation bug now blocking the client detail+chat flow entirely.",
+    "server.py is 528 lines — approaching the 700-line split guideline; consider extracting storage/push helpers into modules."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_store_workflow.py",
+    "/app/test_reports/pytest/iteration_3.xml",
+    "/app/test_reports/iteration_3.json"
+  ],
+  "success_rate": {"backend": "100% (19/19 incl. regression)", "frontend": "92% — all store/OS/photo flows passed; client portal detail navigation broken"},
+  "seed_data_creation": "TEST_ products (TEST Bateria Moto G id varies, edited to R$140 stock 2 min 1; TEST_Estoque/TEST_Insuf/TEST_Neg/TEST_Produto/TEST_Venda/TEST_Zero), 3 TEST sales, OS 'TEST Cliente I3' TF-066E2A (id 8db286ce-9d32-484c-8a9f-420b4872b5a8, status Em análise, 1 repair photo via Object Storage, 1 chat message), plus TEST_ orders from pytest. No cleanup endpoints exist.",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Base URL https://os-tracker-reparo.preview.emergentagent.com, viewport 390x844. Product 'TEST Bateria Moto G' (stock 2, min 1, price 140) and OS TF-066E2A can be reused. Retest: client portal -> 'Ver detalhes e conversar' must show order detail + chat after the id/tracking_code fix. register-push 500 is expected in preview. Existing seed 'Tela iPhone 13' stock is 6.",
+  "rca_of_issue": "Bug: client portal detail navigation fails. Reproduce: /client -> enter TF-066E2A -> Consultar ordem -> 'Ver detalhes e conversar' -> red error 'Codigo de acompanhamento invalido'. RCA: client.tsx router.push({pathname: '/order/[id]', params: {id: order.id, role: 'client'}}); order/[id].tsx load() calls api.getTracking(String(id)) when isClient, hitting GET /api/tracking/{uuid} which only matches tracking_code -> 404 (verified: tracking by UUID returns 404). Mitigation: make tracking endpoint also match order id, or pass tracking_code and switch loadMessages/send to use order.id after load. Workaround until fixed: none for clients on web."
+}

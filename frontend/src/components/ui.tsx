@@ -20,7 +20,7 @@ export function Header({ title, subtitle, back = true }: { title: string; subtit
   const { colors } = useTheme();
   return <View style={styles.header}>
     {back ? <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.back}><Ionicons name="arrow-back" size={22} color={colors.onSurface} /></Pressable> : null}
-    <View style={styles.headerCopy}><Text style={[styles.eyebrow, { color: colors.brandPrimary }]}>TECFLOW OS</Text><Text style={[styles.title, { color: colors.onSurface }]}>{title}</Text>{subtitle ? <Text style={[styles.subtitle, { color: colors.muted }]}>{subtitle}</Text> : null}</View>
+    <View style={styles.headerCopy}><Text style={[styles.eyebrow, { color: colors.brandPrimary }]}>HDTECH</Text><Text style={[styles.title, { color: colors.onSurface }]}>{title}</Text>{subtitle ? <Text style={[styles.subtitle, { color: colors.muted }]}>{subtitle}</Text> : null}</View>
   </View>;
 }
 

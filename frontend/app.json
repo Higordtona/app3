@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "frontend",
+    "name": "Hdtech",
     "slug": "frontend",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -11,16 +11,15 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSCameraUsageDescription": "Fotografe o aparelho para registrar a OS.",
-        "NSPhotoLibraryUsageDescription": "Escolha fotos para anexar à OS.",
-        "NSUserNotificationsUsageDescription": "Receba atualizações do reparo."
+        "NSPhotoLibraryUsageDescription": "Escolha fotos para anexar à OS."
       },
       "bundleIdentifier": "com.emergent.ostrackerreparo.vo3kjd"
     },
     "android": {
-      "permissions": ["CAMERA", "READ_MEDIA_IMAGES", "POST_NOTIFICATIONS"],
+      "permissions": ["CAMERA", "READ_MEDIA_IMAGES"],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#000000"
+        "backgroundColor": "#0056B3"
       },
       "package": "com.emergent.ostrackerreparo.vo3kjd"
     },
@@ -37,7 +36,7 @@
           "image": "./assets/images/splash-image.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#000000"
+          "backgroundColor": "#0056B3"
         }
       ],
       "expo-font",
@@ -45,7 +44,6 @@
       "expo-secure-store",
       "expo-web-browser",
       "expo-status-bar"
-      ,"expo-notifications"
     ],
     "experiments": {
       "typedRoutes": true

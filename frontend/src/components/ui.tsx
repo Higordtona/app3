@@ -24,16 +24,16 @@ export function Header({ title, subtitle, back = true }: { title: string; subtit
   </View>;
 }
 
-export function Button({ label, onPress, secondary = false, loading = false, icon }: { label: string; onPress: () => void; secondary?: boolean; loading?: boolean; icon?: keyof typeof Ionicons.glyphMap }) {
+export function Button({ label, onPress, secondary = false, loading = false, icon, testID }: { label: string; onPress: () => void; secondary?: boolean; loading?: boolean; icon?: keyof typeof Ionicons.glyphMap; testID?: string }) {
   const { colors } = useTheme();
-  return <Pressable accessibilityRole="button" onPress={onPress} disabled={loading} style={({ pressed }) => [styles.button, { backgroundColor: secondary ? colors.brandSecondary : colors.brandPrimary, opacity: pressed || loading ? 0.75 : 1 }]}>
+  return <Pressable testID={testID} accessibilityRole="button" onPress={onPress} disabled={loading} style={({ pressed }) => [styles.button, { backgroundColor: secondary ? colors.brandSecondary : colors.brandPrimary, opacity: pressed || loading ? 0.75 : 1 }]}>
     {loading ? <ActivityIndicator color={secondary ? colors.onBrandSecondary : colors.onBrandPrimary} /> : <>{icon ? <Ionicons name={icon} size={18} color={secondary ? colors.onBrandSecondary : colors.onBrandPrimary} /> : null}<Text style={[styles.buttonText, { color: secondary ? colors.onBrandSecondary : colors.onBrandPrimary }]}>{label}</Text></>}
   </Pressable>;
 }
 
-export function Field({ label, value, onChangeText, placeholder, keyboardType = "default", multiline = false, autoCapitalize = "sentences" }: { label: string; value: string; onChangeText: (value: string) => void; placeholder?: string; keyboardType?: "default" | "email-address" | "phone-pad" | "numeric"; multiline?: boolean; autoCapitalize?: "none" | "sentences" | "words" | "characters" }) {
+export function Field({ label, value, onChangeText, placeholder, keyboardType = "default", multiline = false, autoCapitalize = "sentences", testID }: { label: string; value: string; onChangeText: (value: string) => void; placeholder?: string; keyboardType?: "default" | "email-address" | "phone-pad" | "numeric"; multiline?: boolean; autoCapitalize?: "none" | "sentences" | "words" | "characters"; testID?: string }) {
   const { colors } = useTheme();
-  return <View style={styles.field}><Text style={[styles.label, { color: colors.onSurfaceSecondary }]}>{label}</Text><TextInput value={value} onChangeText={onChangeText} placeholder={placeholder} placeholderTextColor={colors.muted} keyboardType={keyboardType} multiline={multiline} autoCapitalize={autoCapitalize} style={[styles.input, { color: colors.onSurface, borderColor: colors.border, backgroundColor: colors.surfaceSecondary }, multiline && styles.multiline]} /></View>;
+  return <View style={styles.field}><Text style={[styles.label, { color: colors.onSurfaceSecondary }]}>{label}</Text><TextInput testID={testID} accessibilityLabel={label} value={value} onChangeText={onChangeText} placeholder={placeholder} placeholderTextColor={colors.muted} keyboardType={keyboardType} multiline={multiline} autoCapitalize={autoCapitalize} style={[styles.input, { color: colors.onSurface, borderColor: colors.border, backgroundColor: colors.surfaceSecondary }, multiline && styles.multiline]} /></View>;
 }
 
 export function StatusPill({ status }: { status: Status | string }) {

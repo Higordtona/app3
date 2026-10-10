@@ -8,7 +8,7 @@ Assistências técnicas precisam registrar celulares e notebooks com evidências
 - **Backend:** FastAPI em `backend/server.py`, rotas com prefixo `/api`.
 - **Dados:** MongoDB via Motor; IDs string, projeções sem `_id`.
 - **Fotos:** Emergent Object Storage (upload via `POST /api/upload`, leitura via `GET /api/files/{path}`); base64 legado ainda renderiza.
-- **Acesso:** app abre na área do CLIENTE; painel da equipe protegido por PIN (env `ADMIN_PIN`, hoje `2798`) → token temporário em `admin_sessions` (Mongo, TTL 12h) enviado como `X-Admin-Token`. Rotas admin protegidas com `Depends(require_admin)`.
+- **Acesso:** app abre na área do CLIENTE; painel da equipe protegido por PIN (env `ADMIN_PIN`, configurado nos secrets do backend) → token temporário em `admin_sessions` (Mongo, TTL 12h) enviado como `X-Admin-Token`. Rotas admin protegidas com `Depends(require_admin)`.
 - **Pagamento da loja:** Pix manual — checkout exibe a chave (env `STORE_PIX_KEY`, hoje `99991743443`); pedido fica "Aguardando pagamento" até a equipe confirmar em Vendas.
 
 ## Personas

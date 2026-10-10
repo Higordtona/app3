@@ -10,7 +10,7 @@ class TestAdminGate:
     """Painel da equipe protegido por PIN"""
 
     def test_unlock_wrong_pin_401(self, api_client, base_url):
-        resp = api_client.post(f"{base_url}/api/admin/unlock", json={"pin": "0000"}, timeout=15)
+        resp = api_client.post(f"{base_url}/api/admin/unlock", json={"pin": "0000000"}, timeout=15)
         assert resp.status_code == 401
 
     def test_unlock_bad_format_400(self, api_client, base_url):

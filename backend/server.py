@@ -311,8 +311,8 @@ async def root():
 # ---------------------------------------------------------------------------
 @api_router.post("/admin/unlock")
 async def admin_unlock(body: PinBody, request: Request):
-    if len(body.pin) != 4 or not body.pin.isdigit():
-        raise HTTPException(400, "O PIN deve ter 4 dígitos")
+    if len(body.pin) != 7 or not body.pin.isdigit():
+        raise HTTPException(400, "O PIN deve ter 7 dígitos")
     await check_unlock_throttle(request.client.host if request.client else "unknown")
     if not ADMIN_PIN or not hmac.compare_digest(body.pin, ADMIN_PIN):
         raise HTTPException(401, "PIN inválido")

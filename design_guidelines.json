@@ -1,0 +1,159 @@
+{
+  "app_name": "TecFlow OS",
+  "personality": "1 iOS-Native Clean",
+  "personality_one_liner": "Professional, crystal-clear technical service management with dual roles for technicians and clients.",
+  "color": {
+    "surface": "#F8F9FA",
+    "onSurface": "#1A1D20",
+    "surfaceSecondary": "#FFFFFF",
+    "onSurfaceSecondary": "#1A1D20",
+    "surfaceTertiary": "#E9ECEF",
+    "onSurfaceTertiary": "#495057",
+    "surfaceInverse": "#212529",
+    "onSurfaceInverse": "#F8F9FA",
+    "brand": "#0056B3",
+    "brandPrimary": "#0056B3",
+    "onBrandPrimary": "#FFFFFF",
+    "brandSecondary": "#E7F1FF",
+    "onBrandSecondary": "#0056B3",
+    "brandTertiary": "#D0E1FD",
+    "onBrandTertiary": "#003D82",
+    "success": "#198754",
+    "onSuccess": "#FFFFFF",
+    "warning": "#FFC107",
+    "onWarning": "#212529",
+    "error": "#DC3545",
+    "onError": "#FFFFFF",
+    "info": "#0dcaf0",
+    "onInfo": "#212529",
+    "border": "#DEE2E6",
+    "borderStrong": "#CED4DA",
+    "divider": "#E9ECEF",
+    "muted": "#6C757D",
+    "onBrand": "#FFFFFF"
+  },
+  "typography": {
+    "displayFontFamily": "Inter",
+    "textFontFamily": "Inter",
+    "scale": {
+      "sm": 12,
+      "base": 14,
+      "lg": 16,
+      "xl": 20,
+      "2xl": 24
+    }
+  },
+  "spacing": {
+    "rule": "Generous iOS spacing rhythm with comfortable touch targets and clear grouping.",
+    "xs": 4,
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 24,
+    "2xl": 32,
+    "3xl": 48
+  },
+  "radius_tokens": {
+    "sm": 6,
+    "md": 12,
+    "lg": 20,
+    "pill": 999
+  },
+  "shadow_tier": "1",
+  "navigation": "bottom_tabs",
+  "icon_set": "Ionicons",
+  "glassmorphism": {
+    "enabled": false,
+    "do's": ["Maintain clean high-contrast surfaces", "Solid white cards with subtle 1px border"],
+    "dont's": ["Avoid heavy blurs", "Avoid dark low-contrast modes for utility workflows"]
+  },
+  "platform_libraries": {
+    "glass": {
+      "ios": "expo-glass-effect",
+      "android": "expo-blur",
+      "low_end_android_fallback": "solid surfaceSecondary"
+    },
+    "image": "expo-image",
+    "blur": "expo-blur",
+    "bottom_sheet": "@gorhom/bottom-sheet",
+    "animation": "react-native-reanimated",
+    "gesture": "react-native-gesture-handler"
+  },
+  "screens": [
+    {
+      "name": "RoleSelect",
+      "purpose": "Select portal between Technician/Shop and Customer tracking.",
+      "states": {
+        "loading": "Centered spinner",
+        "empty": "N/A",
+        "error": "Banner with retry"
+      },
+      "layout": "Centered clean cards with icons and clear descriptive text for quick role entry."
+    },
+    {
+      "name": "TechHome",
+      "purpose": "Dashboard for technicians displaying active service orders, financial stats, and quick intake.",
+      "states": {
+        "loading": "Skeleton card placeholders",
+        "empty": "Illustration + 'No active repair orders' + New Service Order CTA",
+        "error": "Error message banner + Retry button"
+      },
+      "layout": "Sticky header with financial summary box (revenue, parts cost, net profit), filter chips, and vertical list of service orders with status badges."
+    },
+    {
+      "name": "OrderIntakeWizard",
+      "purpose": "Step-by-step intake wizard for new smartphone or laptop repairs with checklist and initial photos.",
+      "states": {
+        "loading": "Spinner",
+        "empty": "N/A",
+        "error": "Validation error alert"
+      },
+      "layout": "Step indicator at top, form fields for client info, device selection (phone/laptop), defect notes, checklist toggles, and photo attachment grid."
+    },
+    {
+      "name": "OrderDetail",
+      "purpose": "Comprehensive view of a specific service order including stages, repair notes, financial breakdown, and live timeline.",
+      "states": {
+        "loading": "Skeleton loader",
+        "empty": "N/A",
+        "error": "Error state message"
+      },
+      "layout": "Segmented tabs (Overview, Checklist & Photos, Budget & Parts, Live Timeline), bottom sticky action bar for status updates."
+    },
+    {
+      "name": "LiveChat",
+      "purpose": "Real-time communication channel between technician and client regarding the repair progress.",
+      "states": {
+        "loading": "Message skeleton",
+        "empty": "Start conversation prompt",
+        "error": "Connection retry banner"
+      },
+      "layout": "Chat bubble interface with sticky bottom input bar, photo attachment button, and message timestamps."
+    },
+    {
+      "name": "ClientTracking",
+      "purpose": "Public tracking portal for clients to view real-time repair progress, budget approval, and delivery photos via link.",
+      "states": {
+        "loading": "Loading status spinner",
+        "empty": "Enter Tracking Code prompt",
+        "error": "Invalid code state"
+      },
+      "layout": "Progress timeline stepper at top, device status card, financial quote approval box, and photo gallery for intake, repair, and delivery."
+    }
+  ],
+  "images": {
+    "workshop_banner": {
+      "url": "https://images.unsplash.com/photo-1746005718004-1f992c399428?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "alt": "Modern repair workshop desk technician smartphone laptop"
+    },
+    "smartphone_parts": {
+      "url": "https://images.unsplash.com/photo-1746005514011-ea00280f3b6e?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "alt": "iPhone components disassembled on blue mat"
+    },
+    "laptop_workspace": {
+      "url": "https://images.unsplash.com/photo-1760348213488-a49b72148e48?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "alt": "Computer desk with workstation"
+    }
+  },
+  "instructions_to_main_agent": "Build TecFlow OS following the iOS-Native Clean personality. Implement dual portals: Technician/Shop dashboard with financial tracking (revenue, parts used, net profit), order intake wizard with checklist & photo capture, order detail with stage progression, real-time chat, and push notification toggles. Also implement the Client Tracking portal accessible via tracking link with visual status timeline, budget approval, and photo gallery (intake, repair, delivery). Ensure all forms are robust with proper loading, empty, and error states."
+}
